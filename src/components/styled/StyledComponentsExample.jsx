@@ -1,74 +1,59 @@
-import React from 'react'
-import styled from 'styled-components';
+import React,{ useState } from 'react'
+import styled, { ThemeProvider, createGlobalStyle } from 'styled-components';
 
-// Create a Title component that'll render an <h1> tag with some styles
-const Title = styled.h1`
-font-size: 1.5em;
-text-align: center;
-color: palevioletred;
-`;
-
-// Create a Wrapper component that'll render a <section> tag with some styles
-const Wrapper = styled.section`
-padding: 4em;
-background: papayawhip;
-`;
-
+// Define our button, but with the use of props.theme this time
 const Button = styled.button`
-/* Adapt the colors based on primary prop */
-background: ${props => props.primary ? "palevioletred" : "white"};
-color: ${props => props.primary ? "white" : "palevioletred"};
+  font-size: 1em;
+  margin: 1em;
+  padding: 0.25em 1em;
+  border-radius: 3px;
 
-font-size: 1em;
-margin: 1em;
-padding: 0.25em 1em;
-border: 2px solid palevioletred;
-border-radius: 3px;
+  /* Color the border and text with theme.main */
+  color: ${props => props.theme.main};
+  border: 2px solid ${props => props.theme.borderColor};
 `;
 
-// A new component based on Button, but with some override styles
-const TomatoButton = styled(Button)`
-color: tomato;
-border-color: tomato;
-`;
-
-const ReversedButton = props => <Button {...props} children={props.children.split('').reverse()} />
-
-const Thing = styled.div.attrs((/* props */) => ({ tabIndex: 0 }))`
-  color: blue;
-
-  &:hover {
-    color: red; // <Thing> when hovered
+// We are passing a default theme for Buttons that arent wrapped in the ThemeProvider
+Button.defaultProps = {
+  theme: {
+    main: "red",
+    borderColor: "blue",
   }
+}
 
-  & ~ & {
-    background: tomato; // <Thing> as a sibling of <Thing>, but maybe not directly next to it
-  }
+// Define what props.theme will look like
+const defaultTheme = {
+  main: "green",
+  borderColor: "green",
+};
 
-  & + & {
-    background: lime; // <Thing> next to <Thing>
-  }
+const redTheme = {
+    color: "red",
+    borderColor: "red",
+};
 
-  &.something {
-    background: orange; // <Thing> tagged with an additional CSS class ".something"
-  }
-
-  .something-else & {
-    border: 1px solid; // <Thing> inside another element labeled ".something-else"
+const GlobalStyle = createGlobalStyle`
+  button {
+    background-color: pink;
   }
 `
 
 export default function StyledComponentsExample() {
+    const [theme, setTheme] = useState(defaultTheme);
     return (
         // Use Title and Wrapper like any other React component – except they're styled!
         <>
-            <Thing>Hello world!</Thing>
-            <Thing>How ya doing?</Thing>
-            <Thing className="something">The sun is shining...</Thing>
-            <div>Pretty nice day today.</div>
-            <Thing>Don't you think?</Thing>
-            <div className="something-else">
-            <Thing>Splendid.</Thing>
+            <div>
+                <GlobalStyle />
+                <button onClick={()=>setTheme(redTheme)}>red</button>
+                <button onClick={()=>setTheme(defaultTheme)}>green</button>
+                <ThemeProvider theme={theme}>
+                    <Button>Normal</Button>
+                    <Button>Themed</Button>
+                </ThemeProvider>
+            </div>
+            <div>
+                <button>Other</button>
             </div>
         </>
     )
